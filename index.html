@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de QR Code</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+<script src="https://unpkg.com/feather-icons"></script>
+
+<style>
+:root {
+  --black: #0f0f0f;
+  --white: #ffffff;
+  --gray: #1c1c1c;
+  --border: rgba(255,255,255,.15);
+}
+
+/* ======== GERAL ======== */
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;        /* centraliza horizontalmente */
+  background: linear-gradient(-45deg, #000, #111, #1a1a1a, #000);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: var(--white);
+}
+
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Garante que o conteúdo principal ocupe espaço flexível */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* centraliza verticalmente o card */
+  align-items: center;
+  width: 100%;
+}
+
+
+/* ======== CABEÇALHO ======== */
+/* ======== CABEÇALHO ======== */
+@keyframes headerGlow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2),
+                0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  to {
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
+                0 0 20px rgba(255, 255, 255, 0.2);
+  }
+}
+
+header {
+  width: 100%;
+  padding: 0.8rem 0;
+  text-align: center;
+  background: #000; /* preto sólido */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  animation: headerGlow 3s ease-in-out infinite alternate; /* ✨ brilho suave */
+}
+
+ 
+/* ======== CARD ======== */
+@keyframes borderGlow {
+  from {
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  to {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.card {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+  animation: borderGlow 3s ease-in-out infinite alternate;
+  transition: all 0.3s ease;
+  margin: 2rem auto;
+}
+
+/* ======== FORM ======== */
+/* ======== INPUT ======== */
+input {
+  width: 100%;
+  padding: .8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: var(--gray);
+  color: var(--white);
+  transition: all 0.3s ease;
+  outline: none; /* remove a borda azul */
+  box-shadow: 0 0 6px rgba(255,255,255,0.1);
+}
+
+input::placeholder {
+  color: rgba(255,255,255,.6);
+}
+
+input:focus {
+  outline: none; /* 🔥 remove borda azul */
+  border-color: rgba(255,255,255,0.6);
+  box-shadow: 
+    0 0 6px rgba(255,255,255,0.4),
+    0 0 12px rgba(255,255,255,0.2); /* ✨ leve brilho branco */
+  background: rgba(28,28,28,0.9);
+}
+
+/* ======== BOTÕES ======== */
+ 
+@keyframes neonButton {
+  from {
+    box-shadow: 
+      0 0 4px rgba(255, 255, 255, 0.4),
+      0 0 8px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  to {
+    box-shadow: 
+      0 0 8px rgba(255, 255, 255, 0.6),
+      0 0 16px rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+button {
+  width: 100%;
+  height: 60px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: var(--black);
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  transition: all 0.3s ease;
+  animation: neonButton 2.5s ease-in-out infinite alternate; /* ✨ neon pulsando */
+  outline: none; /* remove borda azul */
+}
+
+button:focus,
+button:active {
+  outline: none;
+  box-shadow: none;
+}
+
+button:hover {
+  background: var(--white);
+  color: var(--black);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.7),
+    0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+button:hover i {
+  stroke: var(--black);
+}
+
+
+/* ======== QR CODE ======== */
+#qrcode {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+#qrcode.visible {
+  display: block;
+}
+
+#qrcode img {
+  display: block;
+  margin: 0 auto 0.8rem auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255,255,255,.15);
+}
+
+#qrcode div {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.icon-btn {
+  width: 100px;
+  height: 60px;
+  padding: 0;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* ======== RODAPÉ ======== */
+footer {
+  width: 100%;
+  text-align: center;
+  padding: 0.8rem 0;
+  font-size: 1rem;
+  color: #ffffff;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  animation: borderGlow 3s ease-in-out infinite alternate;
+  margin-top: auto; /* mantém o footer no final da página */
+}
+footer {
+  width: 100%;
+  text-align: center;
+  padding: 0.8rem 0;
+  font-size: 1rem;
+  color: #fff;
+  background: #000; /* 🔥 preto sólido */
+  border-top: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+}
+/* ======== RESPONSIVIDADE ======== */
+
+/* Dispositivos pequenos (celulares até 480px) */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    width: 95%;
+    margin: 2rem auto;
+  }
+
+  input, button {
+    height: 50px;
+    font-size: 1rem;
+  }
+
+  #qrcode img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .icon-btn {
+    height: 50px;
+    width: 80px;
+  }
+
+  footer {
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablets (até 768px) */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    width: 90%;
+    padding: 1.8rem;
+  }
+
+  input, button {
+    font-size: 1rem;
+  }
+}
+
+/* Telas grandes (monitores) */
+@media (min-width: 1024px) {
+  header h1 {
+    font-size: 2.2rem;
+  }
+
+  .card {
+    max-width: 480px;
+  }
+
+  footer {
+    font-size: 1.1rem;
+  }
+}
+/* ======== NOTIFICAÇÃO DE VIDRO CENTRAL ======== */
+.notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 1.2rem 2rem;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  font-size: 1.1rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 1000;
+  animation: glowBorder 2.5s ease-in-out infinite alternate;
+}
+
+/* estado visível */
+.notification.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* brilho nas bordas */
+@keyframes glowBorder {
+  from {
+    box-shadow: 0 0 8px rgba(255,255,255,0.25);
+  }
+  to {
+    box-shadow: 0 0 18px rgba(255,255,255,0.45);
+  }
+}
+
+/* Responsivo: notificação mais compacta em telas pequenas */
+@media (max-width: 480px) {
+  .notification {
+    width: 80%;
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+  }
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Gerador de QR Code</h1>
+</header>
+
+<main>
+  <div class="card">
+    <div class="form-group">
+      <input type="text" id="qrText" placeholder="Digite um link ou texto...">
+      <button id="generateBtn">
+        <i data-feather="play-circle"></i> Gerar QR Code
+      </button>
+    </div>
+
+    <div id="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="qrcode">
+      <img id="qrImage" width="200" height="200" alt="QR Code">
+      <div>
+        <button id="downloadBtn" class="icon-btn"><i data-feather="download"></i></button>
+        <button id="copyBtn" class="icon-btn"><i data-feather="copy"></i></button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="notification" class="notification"></div>
+
+
+<footer>
+  © Gabriel Borges. Todos os direitos reservados. • 2025
+</footer>
+
+<script>
+ 
+feather.replace();
+
+const qrText = document.getElementById("qrText");
+const generateBtn = document.getElementById("generateBtn");
+const qrImage = document.getElementById("qrImage");
+const qrcodeDiv = document.getElementById("qrcode");
+const loading = document.getElementById("loading");
+const downloadBtn = document.getElementById("downloadBtn");
+const copyBtn = document.getElementById("copyBtn");
+
+// 🧊 Função para mostrar notificação de vidro
+function showNotification(message) {
+  const notif = document.getElementById("notification");
+  notif.textContent = message;
+  notif.classList.add("show");
+  setTimeout(() => {
+    notif.classList.remove("show");
+  }, 3000);
+}
+
+generateBtn.onclick = () => {
+  if (!qrText.value.trim()) {
+    showNotification("Digite um texto ou link!");
+    return;
+  }
+
+  loading.style.display = "block";
+  qrcodeDiv.classList.remove("visible");
+
+  qrImage.src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrText.value)}`;
+
+  qrImage.onload = () => {
+    loading.style.display = "none";
+    qrcodeDiv.classList.add("visible");
+    showNotification(" QR Code gerado com sucesso!");
+  };
+};
+
+downloadBtn.onclick = () => {
+  if (!qrImage.src) {
+    showNotification("Gere um QR Code primeiro!");
+    return;
+  }
+  const a = document.createElement("a");
+  a.href = qrImage.src;
+  a.download = "qrcode.png";
+  a.click();
+  showNotification("  QR Code baixado!");
+};
+
+copyBtn.onclick = () => {
+  if (!qrImage.src) {
+    showNotification("Gere um QR Code primeiro!");
+    return;
+  }
+  navigator.clipboard.writeText(qrImage.src);
+  showNotification(" Link do QR Code copiado!");
+};
+ 
+
+
+</script>
+
+</body>
+</html>
