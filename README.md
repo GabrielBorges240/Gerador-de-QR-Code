@@ -1,18 +1,19 @@
-# Gerador de Senhas Seguras
+# Gerador de QR Code
 
-Ferramenta para criação de senhas fortes e personalizadas.
+Aplicação que gera QR Codes a partir de textos ou URLs informados pelo usuário.
 
 Demo:  https://gabrielborges240.github.io/Gerador-de-QR-Code/
 
 ## Funcionalidades
-- Escolha de tamanho da senha
-- Inclusão de letras, números e símbolos
-- Geração aleatória segura
+- Geração instantânea de QR Code
+- Suporte a texto e URLs
+- Interface simples e intuitiva
 
 ## Tecnologias
 - HTML5
 - CSS3
 - JavaScript
+- Biblioteca de QR Code
 
 ## Como executar
 Abra o arquivo `index.html` no navegador.
